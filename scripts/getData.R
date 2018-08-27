@@ -4,6 +4,7 @@ library(XML)
 library(httr)
 library(stringr)
 library(ggmap)
+
 getUCLData <- function(){
   urlUCL <- "https://en.wikipedia.org/wiki/List_of_European_Cup_and_UEFA_Champions_League_winning_players"
   dat <- GET(url = urlUCL)
@@ -17,14 +18,15 @@ getUCLData <- function(){
   uclData$Nationality <- as.factor(uclData$Nationality)
   uclData$`Titles won` <- as.numeric(uclData$`Titles won`)
   
-  
+  # Get each player's URL information
   hrefFun <- function(x){ xpathSApply(x,"./a/@href") } 
   table2 <- readHTMLTable(content(dat, "text"), elFun = hrefFun, stringsAsFactors = FALSE)
   
   df2 <- table2[2][[1]]
   uclData$URLs <- df2$V1[-1]
 
-  Players <- data.frame(Name = uclData$Player)
+  # Create Players df with names
+  Players <- data.frame(Name = uclData$Player, stringsAsFactors = F)
   
   # UCL Player birthplaces from URLs
   i <- 1
@@ -45,3 +47,8 @@ getUCLData <- function(){
   #### --- fix location apply to correctly give locations
   #### --- get coords from locations
 }
+
+
+# Save data files
+save(Players, file = "scripts/UCLPlayers.dat")
+save(Locations, file = "scripts/UCLLocations.dat")
