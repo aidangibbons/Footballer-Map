@@ -1,0 +1,3 @@
+Notes on Footballer Map:
+
+Initial data gathering for UCL was simple enough, using the wikipedia page to import player names, teams, winning years etc. From this I then accessed each players' wikipedia page using their associated hyperlinks. While this worked for the most part I had a lot of trouble with firstly many articles having a "lack of citations" warning at the top, which counts as a html table annoyingly, and then various other issues such as an incorrect hyperlink, future career meaning they don't have the default footballer sidebar, or simply not having a wikipedia at all which caused a lot of fun googling.

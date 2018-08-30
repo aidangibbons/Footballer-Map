@@ -9,7 +9,9 @@ getUCLData <- function(){
   urlUCL <- "https://en.wikipedia.org/wiki/List_of_European_Cup_and_UEFA_Champions_League_winning_players"
   dat <- GET(url = urlUCL)
   doc <- readHTMLTable(
-    doc = content(dat, "text"), StringsAsFactors = F)
+    doc = content(dat, "text"), 
+    StringsAsFactors = F)
+  
   uclData <- doc[2][[1]]
   uclData[] <- lapply(uclData, as.character)
   colnames(uclData) <- uclData[1, ]
@@ -26,11 +28,12 @@ getUCLData <- function(){
   uclData$URLs <- df2$V1[-1]
 
   # Create Players df with names
-  Players <- data.frame(Name = uclData$Player, stringsAsFactors = F)
+  uclPlayers <- data.frame(Name = uclData$Player, stringsAsFactors = F)
   
-  # UCL Player birthplaces from URLs
+  # Get UCL Player birthplaces from URLs
   i <- 1
-  Players$Location <- sapply(uclData$URLs, FUN = function(x) {
+
+  uclPlayers$Birthplace <- sapply(uclData$URLs, FUN = function(x) {
     if(i %% 50 == 0){print(i)}
     i <<- i + 1
     urlUCLPlayer <- paste0("https://en.wikipedia.org", x)
@@ -40,9 +43,61 @@ getUCLData <- function(){
     as.character(docUCLP[1][[1]]$V2[indPOB])
   })
   
-  # UCL Location coordinates
-  UCLCoords <- as.vector(sapply(Players$Location[1:10], FUN = geocode))
+  # Get broken locations
+  brokenLocs <- c()
+  for(i in 1:793){
+    if (identical(uclPlayers$Birthplace[[i]], character(0))){
+      brokenLocs <- c(brokenLocs, i)
+    }
+  }
   
+  # Fix broken locations with 'lack of citation' topper
+  i <- 1
+  uclPlayers$Birthplace[brokenLocs] <- sapply(uclData$URLs[brokenLocs], FUN = function(x) {
+    if(i %% 50 == 0){print(i)}
+    i <<- i + 1
+    urlUCLPlayer <- paste0("https://en.wikipedia.org", x)
+    datUCLP <- GET(url = urlUCLPlayer)
+    docUCLP <- readHTMLTable(doc = content(datUCLP, "text"), StringsAsFactors = F)
+    indPOB <- which(as.character(docUCLP[2][[1]]$V1[1:10]) == "Place of birth")
+    as.character(docUCLP[2][[1]]$V2[indPOB])
+  })
+  
+  # Get broken locations
+  brokenLocs <- c()
+  for(i in 1:793){
+    if (identical(uclPlayers$Birthplace[[i]], character(0))){
+      brokenLocs <- c(brokenLocs, i)
+    }
+  }
+  
+  ## Remaining locations with varying issues -- Entered manually
+  importBrokenUCL()
+  
+  # Final broken location check
+  brokenLocs <- c()
+  for(i in 1:793){
+    if (identical(uclPlayers$Birthplace[[i]], character(0))){
+      brokenLocs <- c(brokenLocs, i)
+    }
+  }
+  # Convert locations column into a vector rather than a list
+  names(uclPlayers$Birthplace) <- NULL
+  uclPlayers$Birthplace <- unlist(uclPlayers$Birthplace)
+  
+  # UCL Location coordinates
+  uclLocations <- data.frame(Locs = uclPlayers$Birthplace, stringsAsFactors = F)
+  names(Locations) <- NULL
+  
+  coordErrs <- c()
+  UCLCoords <- matrix(ncol = 2)
+  UCLCoords2 <- sapply(uclPlayers$Birthplace[1:5], function(x) {
+    curr <- geocode(x)
+    if (is.na(curr$lat) | is.na(curr$lon)){
+      coordErrs <- c(coordErrs, x)
+    }
+    curr
+  })
   
   #### --- fix location apply to correctly give locations
   #### --- get coords from locations
