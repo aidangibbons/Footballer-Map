@@ -85,20 +85,30 @@ getUCLData <- function(){
   names(uclPlayers$Birthplace) <- NULL
   uclPlayers$Birthplace <- unlist(uclPlayers$Birthplace)
   
-  # UCL Location coordinates
-  uclLocations <- data.frame(Locs = uclPlayers$Birthplace, stringsAsFactors = F)
-  names(Locations) <- NULL
-  
+  # Get all unique locations from the players df
+  uclLocations <- data.frame(Locations = unique(uclPlayers$Birthplace), stringsAsFactors = F)
+
+  # Get location coordinates from location name via geocode
   coordErrs <- c()
-  UCLCoords <- matrix(ncol = 2)
-  UCLCoords2 <- sapply(uclPlayers$Birthplace[1:5], function(x) {
+  uclCoords <- data.frame()
+  i <- 1
+  ##### Re-run this code to correctly obtain errors, then 
+  ##### repeat code to fix limit errors, and manually enter others
+  x <- sapply(uclLocations$Locations, function(x) {
+    if (i %% 50 == 0){print(i)}
+    i <<- i + 1
     curr <- geocode(x)
-    if (is.na(curr$lat) | is.na(curr$lon)){
+    if (!is.numeric(curr$lat) |
+        !is.numeric(curr$lon) | 
+        is.na(curr$lat) | 
+        is.na(curr$lon)) {
       coordErrs <- c(coordErrs, x)
     }
-    curr
+    uclCoords <<- rbind(uclCoords, curr)
   })
+  rm(x)
   
+  uclLocations <- cbind(uclLocations, uclCoords)
   #### --- fix location apply to correctly give locations
   #### --- get coords from locations
 }
