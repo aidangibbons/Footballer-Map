@@ -6,6 +6,7 @@ library(stringr)
 library(ggmap)
 
 getUCLData <- function(){
+  # Original data import ----
   urlUCL <- "https://en.wikipedia.org/wiki/List_of_European_Cup_and_UEFA_Champions_League_winning_players"
   dat <- GET(url = urlUCL)
   doc <- readHTMLTable(
@@ -20,7 +21,7 @@ getUCLData <- function(){
   uclData$Nationality <- as.factor(uclData$Nationality)
   uclData$`Titles won` <- as.numeric(uclData$`Titles won`)
   
-  # Get each player's URL information
+  # Get each player's URL information ----
   hrefFun <- function(x){ xpathSApply(x,"./a/@href") } 
   table2 <- readHTMLTable(content(dat, "text"), elFun = hrefFun, stringsAsFactors = FALSE)
   
@@ -30,7 +31,7 @@ getUCLData <- function(){
   # Create Players df with names
   uclPlayers <- data.frame(Name = uclData$Player, stringsAsFactors = F)
   
-  # Get UCL Player birthplaces from URLs
+  # Get UCL Player birthplaces from URLs ----
   i <- 1
 
   uclPlayers$Birthplace <- sapply(uclData$URLs, FUN = function(x) {
@@ -71,8 +72,8 @@ getUCLData <- function(){
     }
   }
   
-  ## Remaining locations with varying issues -- Entered manually
-  importBrokenUCL()
+  # Remaining locations with varying issues -- Entered manually
+  importBrokenUCLLocs()
   
   # Final broken location check
   brokenLocs <- c()
@@ -88,32 +89,47 @@ getUCLData <- function(){
   # Get all unique locations from the players df
   uclLocations <- data.frame(Locations = unique(uclPlayers$Birthplace), stringsAsFactors = F)
 
-  # Get location coordinates from location name via geocode
-  coordErrs <- c()
-  uclCoords <- data.frame()
-  i <- 1
-  ##### Re-run this code to correctly obtain errors, then 
-  ##### repeat code to fix limit errors, and manually enter others
-  x <- sapply(uclLocations$Locations, function(x) {
-    if (i %% 50 == 0){print(i)}
-    i <<- i + 1
-    curr <- geocode(x)
-    if (!is.numeric(curr$lat) |
-        !is.numeric(curr$lon) | 
-        is.na(curr$lat) | 
-        is.na(curr$lon)) {
-      coordErrs <- c(coordErrs, x)
-    }
-    uclCoords <<- rbind(uclCoords, curr)
-  })
-  rm(x)
   
+  # Get location coordinates from location name via geocode ----
+  uclCoords <- data.frame(lat = rep(NA, nrow(uclLocations)),
+                          lon = rep(NA, nrow(uclLocations)))
+  broken <- 1:nrow(uclLocations)
+  
+  # Repeatedly run this section importing coordinates until no errors
+  # or until only errors that can be solved manually
+  z <- 1
+  repeat {
+    
+    i <- 1
+    y <- sapply(broken, function(x) {
+      if (i %% 50 == 0){print(i)}
+      i <<- i + 1
+      curr <- geocode(uclLocations$Locations[x])
+      uclCoords[x, ] <<- curr
+    })
+    rm(y)
+    broken <- which(is.na(uclCoords$lat))
+    print(length(broken))
+    
+    if ((length(broken) == 1) | (z >= 10)) {
+      break
+    }
+    z <- z + 1
+  }
+  
+  importBrokenUCLCoords()
   uclLocations <- cbind(uclLocations, uclCoords)
-  #### --- fix location apply to correctly give locations
-  #### --- get coords from locations
+  
+
+  # Get location index for each player ----
+  uclPlayers$Index <- rep(NA, nrow(uclPlayers))
+  uclPlayers$Index <- sapply(uclPlayers$Birthplace, function(x){
+    which(uclLocations$Locations == x)
+  })
 }
 
 
-# Save data files
-save(Players, file = "scripts/UCLPlayers.dat")
-save(Locations, file = "scripts/UCLLocations.dat")
+# Save data files ----
+save(uclPlayers, file = "data/UCLPlayers.dat")
+save(uclLocations, file = "data/UCLLocations.dat")
+save(uclCoords, file = "data/uclCoords.dat")

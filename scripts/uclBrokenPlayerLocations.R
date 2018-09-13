@@ -1,5 +1,5 @@
 ## Import individual broken UCL Player Locations
-importBrokenUCL <- function(){
+importBrokenUCLLocs <- function(){
   uclPlayers$Location[123] <<- "Buenos Aires, Argentina" # Javier Zanetti
   uclPlayers$Location[230] <<- "Samtredia, Georgia" # Kakha Kaladze
   uclPlayers$Location[288] <<- "Águilas, Murcia" # Jose Manuel Meca Garcia
@@ -30,4 +30,10 @@ importBrokenUCL <- function(){
   uclPlayers$Location[780] <<- "Guissona, Spain" # Joaquin Oliva
   uclPlayers$Location[783] <<- "Madrid, Spain" # Jose Becerril Minguela
   uclPlayers$Location[784] <<- "Madrid, Spain" # Ramon Marsal
+}
+
+importBrokenUCLCoords <- function(){
+  uclCoords[251, ] <<- data.frame(lat = 37.4119, lon = 1.5826)
+  uclCoords[377, ] <<- data.frame(lat = 42.0912, lon = 19.0899)
+  uclCoords[616, ] <<- data.frame(lat = 41.2988, lon = 1.9930)
 }
