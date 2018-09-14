@@ -87,7 +87,7 @@ getUCLData <- function(){
   uclPlayers$Birthplace <- unlist(uclPlayers$Birthplace)
   
   # Get all unique locations from the players df
-  uclLocations <- data.frame(Locations = unique(uclPlayers$Birthplace), stringsAsFactors = F)
+  uclLocations <- data.frame(Location = unique(uclPlayers$Birthplace), stringsAsFactors = F)
 
   
   # Get location coordinates from location name via geocode ----
@@ -104,7 +104,7 @@ getUCLData <- function(){
     y <- sapply(broken, function(x) {
       if (i %% 50 == 0){print(i)}
       i <<- i + 1
-      curr <- geocode(uclLocations$Locations[x])
+      curr <- geocode(uclLocations$Location[x])
       uclCoords[x, ] <<- curr
     })
     rm(y)
@@ -124,12 +124,24 @@ getUCLData <- function(){
   # Get location index for each player ----
   uclPlayers$Index <- rep(NA, nrow(uclPlayers))
   uclPlayers$Index <- sapply(uclPlayers$Birthplace, function(x){
-    which(uclLocations$Locations == x)
+    which(uclLocations$Location == x)
   })
+  
+  Players <- uclPlayers
+  Players$ucl <- 1
+  Locations <- uclLocations
+
+  # Get associated players for each locations
+  Locations$ucl <- sapply(1:nrow(uclLocations), function(x){
+    paste(collapse = "<br/>",
+          uclPlayers$Name[uclPlayers$Birthplace == uclLocations$Location[x]]
+    )
+  })
+
+  # Save data files ----
+  save(uclPlayers, file = "data/UCLPlayers.dat")
+  save(uclLocations, file = "data/UCLLocations.dat")
+  save(uclCoords, file = "data/uclCoords.dat")
+  save(Players, file = "data/Players.dat")
+  save(Locations, file = "data/Players.dat")
 }
-
-
-# Save data files ----
-save(uclPlayers, file = "data/UCLPlayers.dat")
-save(uclLocations, file = "data/UCLLocations.dat")
-save(uclCoords, file = "data/uclCoords.dat")
