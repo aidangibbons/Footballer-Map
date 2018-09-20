@@ -86,6 +86,9 @@ getUCLData <- function(){
   names(uclPlayers$Birthplace) <- NULL
   uclPlayers$Birthplace <- unlist(uclPlayers$Birthplace)
   
+  
+  uclPlayers$Years <- uclData$Years
+  
   # Get all unique locations from the players df
   uclLocations <- data.frame(Location = unique(uclPlayers$Birthplace), stringsAsFactors = F)
 
