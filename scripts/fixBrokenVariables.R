@@ -15,6 +15,7 @@ importBrokenUCLLocs <- function(){
   uclPlayers$Birthplace[606] <<- "Barrow-in-Furness,England" # Emyln Hughes 
   uclPlayers$Birthplace[608] <<- "Dublin, Ireland" # Steve Heighway
   uclPlayers$Birthplace[621] <<- "Munich, Germany" # Hugo Robl ((unconfirmed))
+  uclPlayers$Birthplace[629] <<- "Freising, Germany" # Sepp Weiss
   uclPlayers$Birthplace[669] <<- "Caselle Lurani, Italy" # Giovanni Lodetti
   uclPlayers$Birthplace[680] <<- "Glenboig, North Lanarkshire, Scotland" # Francis Burns
   uclPlayers$Birthplace[705] <<- "Las Palmas, Spain" # Antonio Betancort
@@ -22,19 +23,14 @@ importBrokenUCLLocs <- function(){
   uclPlayers$Birthplace[708] <<- "Madrid, Spain" # Pedro De Felipe
   uclPlayers$Birthplace[748] <<- "	Barreiro, Portugal" # Jose Augusto Pinto de Almeida
   uclPlayers$Birthplace[760] <<- "Las Palmas, Spain" # Manuel Quevedo Vernetta
+  uclPlayers$Birthplace[761] <<- "Melilla, Spain" # Jose Garcia Castro (Pepillo)
   uclPlayers$Birthplace[766] <<- "Salamanca, Spain" # Miche (Miguel García Martín)
   uclPlayers$Birthplace[771] <<- "Teruel, Spain" # Manuel Torres Pastor
   uclPlayers$Birthplace[772] <<- "Deba, Guipuzcoa, Spain" # Javier Berasaluce Marquiegui
-  uclPlayers$Birthplace[775] <<- "Ksar-el-Kebir" # Heliodoro Castaño Pedrosa
+  uclPlayers$Birthplace[775] <<- "Ksar-el-Kebir, Morocco" # Heliodoro Castaño Pedrosa
   uclPlayers$Birthplace[777] <<- "Alcoy, Spain" # Jose Luis Perez Paya
   uclPlayers$Birthplace[779] <<- "Gavà, Barcelona, Spain" # Joaquin Navarro Perona
   uclPlayers$Birthplace[780] <<- "Guissona, Spain" # Joaquin Oliva
   uclPlayers$Birthplace[783] <<- "Madrid, Spain" # Jose Becerril Minguela
   uclPlayers$Birthplace[784] <<- "Madrid, Spain" # Ramon Marsal
-}
-
-importBrokenUCLCoords <- function(){
-  uclCoords[251, ] <<- data.frame(lat = 37.4119, lon = 1.5826)
-  uclCoords[377, ] <<- data.frame(lat = 42.0912, lon = 19.0899)
-  uclCoords[616, ] <<- data.frame(lat = 41.2988, lon = 1.9930)
 }
