@@ -1,5 +1,4 @@
 # Footballer-Map
-Project for upcoming website/blog. 
 
 Aiming to provide eventually a world map and selectable competitions. 
 
@@ -12,3 +11,5 @@ Clicking again will give a list of the players from that place that have won.
 Additional options for choosing a date range.
 
 - Update from RStudio test
+
+Current app location: https://aidangibbons.shinyapps.io/footballer-map/
